@@ -1,0 +1,33 @@
+{
+  "name": "ms-kora",
+  "version": "1.0.0",
+  "description": "Kora \u2014 GradeX ops bot on Cloudflare Workers",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rapidshyft/MsKora.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/rapidshyft/MsKora/issues"
+  },
+  "homepage": "https://github.com/rapidshyft/MsKora#readme",
+  "dependencies": {
+    "grammy": "^1.46.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260922.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1",
+    "wrangler": "^4.136.2"
+  },
+  "private": true
+}

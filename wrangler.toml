@@ -1,0 +1,15 @@
+name = "ms-kora"
+main = "src/index.ts"
+compatibility_date = "2026-09-22"
+
+# Observability so a failing update is visible in the Cloudflare dashboard
+# rather than only in a tail session.
+[observability]
+enabled = true
+
+# Public configuration only. Secrets are NEVER put here — wrangler.toml is in
+# git. BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET are set with `wrangler secret put`,
+# which stores them encrypted on Cloudflare.
+[vars]
+GRADEX_API_BASE_URL = "https://api.trygradex.app"
+GRADEX_DASHBOARD_BASE_URL = "https://admin.trygradex.app"

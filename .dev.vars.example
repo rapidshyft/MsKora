@@ -1,0 +1,9 @@
+# Local development secrets. Copy to `.dev.vars` and fill in.
+# `.dev.vars` is gitignored — never commit a real token.
+#
+# In production these are Cloudflare Worker secrets, not vars:
+#   npx wrangler secret put BOT_TOKEN
+#   npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
+
+BOT_TOKEN=123456:replace-with-your-bot-token-from-BotFather
+TELEGRAM_WEBHOOK_SECRET=local-dev-secret
