@@ -7,6 +7,7 @@ GradeX's health on demand. It exists to prove the stack end to end before more
 is built on it.
 
 **Stack:** TypeScript · [grammY](https://grammy.dev) · Cloudflare Workers.
+**Live at:** `https://ms-kora.rapidshyft.workers.dev`
 
 ## Why Cloudflare rather than Telegram Serverless
 
@@ -42,7 +43,7 @@ cp .dev.vars.example .dev.vars   # then fill in BOT_TOKEN
 npm run dev
 ```
 
-`.dev.vars` is gitignored. **Never put a token in `wrangler.toml`** — that file
+`.dev.vars` is gitignored. **Never put a token in `wrangler.jsonc`** — that file
 is committed.
 
 Drive an update through the local Worker without Telegram:
@@ -58,7 +59,13 @@ curl -X POST http://localhost:8787/webhook \
 npm run typecheck && npm run test:run
 ```
 
+`typecheck` regenerates `worker-configuration.d.ts` first, so `Env` always
+matches `wrangler.jsonc`. That file is generated, not committed. Requires
+Node 22 or newer — wrangler 4's minimum.
+
 ## Deploying
+
+Already deployed. This is what to do again, or on a fresh account.
 
 ### 1. Authenticate
 
@@ -66,31 +73,40 @@ npm run typecheck && npm run test:run
 npx wrangler login
 ```
 
-### 2. Set the secrets
+### 2. Deploy
 
-These are stored encrypted by Cloudflare. They are **not** in this repo and
-must never be.
+`wrangler.jsonc` declares both secrets under `secrets.required`, so a deploy
+is **refused** until they exist rather than shipping a Worker that 500s on
+every update.
+
+On an account where the Worker does not exist yet, secrets cannot be set in
+advance, so supply them with the deploy. Write the file outside the repo and
+delete it afterwards:
+
+```bash
+umask 077
+cat > /tmp/kora.secrets <<EOF
+BOT_TOKEN=<from @BotFather>
+TELEGRAM_WEBHOOK_SECRET=$(openssl rand -hex 32)
+EOF
+npx wrangler deploy --secrets-file /tmp/kora.secrets
+shred -u /tmp/kora.secrets
+```
+
+Once the Worker exists, rotate either one on its own:
 
 ```bash
 npx wrangler secret put BOT_TOKEN
-npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
 ```
 
-`BOT_TOKEN` comes from [@BotFather](https://t.me/BotFather).
-`TELEGRAM_WEBHOOK_SECRET` is any random string you choose — generate one with
-`openssl rand -hex 32`. Telegram echoes it back on every delivery and Kora
-rejects anything that does not match, so the Worker URL is not an open endpoint
-that anyone can post fabricated updates to.
+Note that `wrangler secret put` **is a deployment** — it creates a version and
+releases it immediately.
 
-### 3. Deploy
+`TELEGRAM_WEBHOOK_SECRET` is any random string. Telegram echoes it back on
+every delivery and Kora rejects anything that does not match, so the Worker
+URL is not an open endpoint anyone can post fabricated updates to.
 
-```bash
-npm run deploy
-```
-
-Note the `https://ms-kora.<your-subdomain>.workers.dev` URL it prints.
-
-### 4. Point Telegram at it
+### 3. Point Telegram at it
 
 ```bash
 curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook" \
