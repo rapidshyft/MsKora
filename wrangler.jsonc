@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ms-kora",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-22",
+
+  // Logs and traces. The top-level `enabled` does not turn traces on by
+  // itself, so `traces.enabled` is set explicitly — the same gap board #106
+  // fixed in the GradeX dashboard's Worker.
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true },
+    "traces": { "enabled": true }
+  },
+
+  // Declared so that type generation does not depend on a gitignored
+  // `.dev.vars` (it "replaces .dev.vars/.env/process.env inference for type
+  // generation"), and so local dev warns when one is missing. Names only —
+  // the values live in Cloudflare's encrypted secret store.
+  "secrets": {
+    "required": ["BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET"]
+  },
+
+  // Public configuration only. Secrets are NEVER here — this file is
+  // committed. BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET are set with
+  // `wrangler secret put`, which stores them encrypted on Cloudflare.
+  "vars": {
+    "GRADEX_API_BASE_URL": "https://api.trygradex.app",
+    "GRADEX_DASHBOARD_BASE_URL": "https://admin.trygradex.app"
+  }
+}
